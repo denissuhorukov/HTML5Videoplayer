@@ -1,0 +1,33 @@
+body {
+    color: white;
+    text-align: center;
+    background-color: black;
+    margin: 0; /* Убираем стандартные отступы body */
+}
+
+#video-container {
+    display: flex; /* Используем Flexbox для центрирования */
+    justify-content: center; /* Центрирование по горизонтали */
+    align-items: center; /* Центрирование по вертикали */
+    min-height: 80vh; /* Минимальная высота, равная высоте viewport (окна браузера) */
+}
+
+#buttons {
+    display: flex; /* Используем Flexbox для центрирования */
+    justify-content: center; /* Центрирование по горизонтали */
+    align-items: center; /* Центрирование по вертикали */
+}
+
+video {
+    width: 60%; /* Ширина видеоплеера от ширины контейнера */
+    max-width: 960px; /* Максимальная ширина видеоплеера */
+    height: auto; /* Высота видео автоматически подбирается по отношению к ширине */
+}
+
+#info {
+    text-align: center; /* Центрирование текста в параграфе */
+}
+
+button {
+    margin: 5px; /* Добавляем небольшие отступы вокруг кнопок */
+}
