@@ -3,49 +3,80 @@ const video = document.getElementById('myVideo');
 const info = document.getElementById('info');
 const prevButton = document.getElementById('prevButton');
 const nextButton = document.getElementById('nextButton');
+const folderInput = document.getElementById('folderInput');
+const setupPanel = document.getElementById('setup-panel');
+const playerPanel = document.getElementById('player-panel');
 
 let videos = [];
 let currentIndex = 0;
+const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv', 'flv', 'm4v', 'wmv'];
 
-// Загрузить список видео из playlist.txt
-async function loadPlaylist() {
-  try {
-    const response = await fetch('playlist.txt');
-    const text = await response.text();
-    videos = text
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
-    
-    // Инициализация плеера после загрузки плейлиста
-    if (videos.length > 0) loadVideo(0);
-  } catch (error) {
-    console.error('Ошибка при загрузке плейлиста:', error);
+// Обработчик выбора папки
+folderInput.addEventListener('change', handleFolderSelect);
+
+function handleFolderSelect(event) {
+  const files = Array.from(event.target.files);
+  
+  // Фильтруем видеофайлы
+  videos = files
+    .filter(file => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      return videoExtensions.includes(ext);
+    })
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(file => ({
+      name: file.name,
+      url: URL.createObjectURL(file),
+      type: file.type || getMimeType(file.name)
+    }));
+  
+  if (videos.length === 0) {
+    alert('В выбранной папке не найдено видеофайлов');
+    return;
   }
+  
+  // Скрыть панель выбора и показать плеер
+  setupPanel.style.display = 'none';
+  playerPanel.style.display = 'block';
+  
+  // Загрузить первое видео
+  loadVideo(0);
 }
 
-// Загрузить плейлист при загрузке страницы
-loadPlaylist();
+function getMimeType(filename) {
+  const ext = filename.split('.').pop().toLowerCase();
+  const mimeTypes = {
+    'mp4': 'video/mp4',
+    'webm': 'video/webm',
+    'ogg': 'video/ogg',
+    'mov': 'video/quicktime',
+    'avi': 'video/x-msvideo',
+    'mkv': 'video/x-matroska',
+    'flv': 'video/x-flv',
+    'm4v': 'video/x-m4v',
+    'wmv': 'video/x-ms-wmv'
+  };
+  return mimeTypes[ext] || 'video/mp4';
+}
 
 function loadVideo(index) {
   if (index < 0 || index >= videos.length) return;
+  
   // Очистить предыдущие <source>
   while (video.firstChild) video.removeChild(video.firstChild);
 
-  const filename = videos[index];
-  const ext = filename.split('.').pop().toLowerCase();
-  const mime = ext === 'mp4' ? 'video/mp4' : ext === 'webm' ? 'video/webm' : 'video/ogg';
-
+  const videoFile = videos[index];
+  
   const source = document.createElement('source');
-  source.src = filename;
-  source.type = mime;
+  source.src = videoFile.url;
+  source.type = videoFile.type;
   video.appendChild(source);
 
-  // Перезагрузить плеер и начать воспроизведение (если нужно)
+  // Перезагрузить плеер и начать воспроизведение
   video.load();
   video.play().catch(() => {}); // Autoplay может быть заблокирован браузером
 
-  info.textContent = `Файл: ${index + 1}/${videos.length}`;
+  info.textContent = `${videoFile.name} — ${index + 1}/${videos.length}`;
   currentIndex = index;
 }
 
