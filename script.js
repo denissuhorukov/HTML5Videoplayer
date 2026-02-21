@@ -92,3 +92,6 @@ function prevVideo() {
 
 prevButton.addEventListener('click', prevVideo);
 nextButton.addEventListener('click', nextVideo);
+
+// Автовоспроизведение следующего видео при окончании текущего
+video.addEventListener('ended', nextVideo);
